@@ -2,6 +2,14 @@ from django.shortcuts import render, get_object_or_404, redirect
 from .models import Product
 from .cart import Cart
 
+def cart_update(request, product_id):
+    cart = Cart(request)
+    if request.method == 'POST':
+        quantity = int(request.POST.get('quantity', 1))
+        cart.update(product_id=product_id, quantity=quantity)
+    return redirect('store:cart_detail')
+
+
 def product_list(request):
     products = Product.objects.filter(available=True)
     return render(request, 'store/product_list.html', {'products': products})
