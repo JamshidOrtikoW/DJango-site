@@ -12,27 +12,41 @@ class Cart:
     def add(self, product, quantity=1, override_quantity=False):
         product_id = str(product.id)
 
-
         item = self.cart.get(product_id)
         if item is None:
-            
             self.cart[product_id] = {'quantity': 0, 'price': str(product.price)}
         else:
-          
             if 'quantity' not in item:
                 item['quantity'] = 0
             if 'price' not in item:
                 item['price'] = str(product.price)
-            
+
             self.cart[product_id] = item
+
         if override_quantity:
             self.cart[product_id]['quantity'] = quantity
         else:
             self.cart[product_id]['quantity'] += quantity
         self.save()
 
-    def save(self):
    
+    def update(self, product_id, quantity):
+        product_id = str(product_id)
+
+        if product_id in self.cart:
+            try:
+                quantity = int(quantity)
+            except:
+                quantity = 1
+
+            if quantity <= 0:
+                del self.cart[product_id]
+            else:
+                self.cart[product_id]['quantity'] = quantity
+
+            self.save()
+
+    def save(self):
         self.session.modified = True
 
     def remove(self, product):
@@ -42,7 +56,6 @@ class Cart:
             self.save()
 
     def __iter__(self):
-
         product_ids = list(self.cart.keys())
         if not product_ids:
             return
@@ -78,4 +91,3 @@ class Cart:
     def clear(self):
         self.session['cart'] = {}
         self.save()
-
